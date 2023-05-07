@@ -1,19 +1,25 @@
-/************************************************************************************//*!
-\file          functions.h
-\project       A1
-\author        Chen Yen Hsun, 20027671
-\par           email: c.yenhsun\@digipen.edu
-\date          May 7, 2023
+/*!*****************************************************************************
+\file functions.h
+\author Chen Yen Hsun
+\par DP email: c.yenhsun\@digipen.edu
+\par Course: CS380
+\par Section: A
+\par Programming Assignment 1
+\date 05-7-2023
 \brief
-               
-
-
+The file includes necessary headers and defines a namespace "AI" 
+which contains various functions and templates. It also includes a 
+struct template "Node" representing a simple graph node, along with 
+serialization and deserialization functions for the node. The file 
+provides implementations of the Breadth-First Search (BFS) and 
+Depth-First Search (DFS) algorithms.
 
 Copyright (C) 2022 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
 without the prior written consent of DigiPen Institute of
 Technology is prohibited.
-*//*************************************************************************************/
+*******************************************************************************/
+
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
@@ -32,7 +38,11 @@ namespace AI
 {
     #define UNUSED(expr) (void)expr;
 
-    // A simple graph node definition with serialization functions
+
+    /*!*****************************************************************************
+    \brief
+    A simple graph node definition with serialization functions
+    *******************************************************************************/
     template<typename T>
     struct Node
     {
@@ -42,6 +52,10 @@ namespace AI
         Node* parent;
         std::list<Node*> children;
 
+        /*!*****************************************************************************
+        \brief
+        Parameter constructor
+        *******************************************************************************/
         Node(T value = {}, Node* parent = nullptr, 
                     const std::list<Node*>& children = {})
             : value{ value }, parent{ parent }, children{ children }
@@ -49,13 +63,29 @@ namespace AI
 
         }
 
+        /*!*****************************************************************************
+        \brief
+        Destructor
+        *******************************************************************************/
         ~Node()
         {
             for (auto child : children)
                 delete child;
         }
 
-        // Serialization
+        /*!*****************************************************************************
+        \brief
+        Serialization operator for the `Node` struct template.
+
+        \param os
+        The output stream to write the serialized node to.
+
+        \param rhs
+        The node to be serialized.
+
+        \return
+        The reference to the output stream after serialization.
+        *******************************************************************************/
         friend std::ostream& operator<<(std::ostream& os, Node const& rhs)
         {
             os << rhs.value << " {";
@@ -68,7 +98,19 @@ namespace AI
             return os;
         }
 
-        // Deserialization
+        /*!*****************************************************************************
+        \brief
+        Deserialization operator for the `Node` struct template.
+
+        \param is
+        The input stream to read the serialized node from.
+
+        \param rhs
+        The node to be deserialized.
+
+        \return
+        The reference to the input stream after deserialization.
+        *******************************************************************************/
         friend std::istream& operator>>(std::istream& is, Node& rhs)
         {
             std::string input;
@@ -77,7 +119,13 @@ namespace AI
             return is;
         }
 
-        // Returns values from root to this node as an array
+        /*!*****************************************************************************
+        \brief
+        Returns values from root to this node as an array
+
+        \return
+        Returns a vector<T>
+        *******************************************************************************/
         std::vector<T> getPath() const
         {
             std::vector<T> r;
@@ -91,8 +139,17 @@ namespace AI
             return r;
         }
 
-        // Deserialization function that turns a stream of bytes 
-        // into an object in memory.
+        /*!*****************************************************************************
+        \brief
+        Deserialization function that turns a stream of bytes
+        into an object in memory.
+
+        \param str
+        The string
+
+        \return
+        Returns a string
+        *******************************************************************************/
         std::string setFromString(std::string str)
         {
 
@@ -139,20 +196,63 @@ namespace AI
             return str;
         }
 
-        // Serialization function that turn a tree in memory into a stream  
-        // of bytes so it can be stored on disk or sent over the network.
+
+        /*!*****************************************************************************
+        \brief
+        Serialization function that turn a tree in memory into a stream
+        of bytes so it can be stored on disk or sent over the network.
+
+        \return
+        Returns a string representation of the node and its children.
+        *******************************************************************************/
         std::string getAsString();
 
         //Helper function
+
+        /*!*****************************************************************************
+        \brief
+        Checks whether a given string represents a number.
+
+        \param str
+        The string to be checked.
+
+        \return
+        Returns true if the string represents a number; otherwise, returns false.
+        *******************************************************************************/
         static bool isnumber(const std::string& str);
     };
 
-    // Implementation of the Breadth-First Search algorithm
+    /*!*****************************************************************************
+    \brief
+    Performs Breadth-First Search (BFS) on a node to find a specific value.
+
+    \param node
+    The starting node for the search.
+
+    \param lookingfor
+    The value to search for.
+
+    \return
+    Returns a pointer to the node containing the searched value if found;
+    otherwise, returns nullptr.
+    *******************************************************************************/
     template<typename T>
     Node<T>* BFS(Node<T>& node, const T& lookingfor);
 
+    /*!*****************************************************************************
+    \brief
+    Performs Depth-First Search (DFS) on a node to find a specific value.
 
-    // Implementation of the Depth-First Search algorithm
+    \param node
+    The starting node for the search.
+
+    \param lookingfor
+    The value to search for.
+
+    \return
+    Returns a pointer to the node containing the searched value if found;
+    otherwise, returns nullptr.
+    *******************************************************************************/
     template<typename T>
     Node<T>* DFS(Node<T>& node, const T& lookingfor);
 
