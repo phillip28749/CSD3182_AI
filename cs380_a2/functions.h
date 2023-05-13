@@ -1,8 +1,28 @@
+/*!*****************************************************************************
+\file functions.h
+\author Chen Yen Hsun
+\par DP email: c.yenhsun\@digipen.edu
+\par Course: CS380
+\par Section: A
+\par Programming Assignment 2
+\date 05-14-2023
+\brief
+
+The file includes necessary headers and defines a namespace "AI"
+which contains various functions and templates.It provides functionalities 
+for flood fill algorithms and includes domain-specific functors and wrappers.
+
+Copyright (C) 2022 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*******************************************************************************/
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
 #include <stack>
 #include <algorithm>
+#include <list>
 
 #include "data.h"
 
@@ -19,52 +39,78 @@ namespace AI
 
     public:
 
+        /*!*****************************************************************************
+         * \brief 
+            Constructs a `GetMapAdjacents` object.
+         *
+         * \param map 
+            A pointer to an array of integers representing the map.
+
+         * \param size 
+            The width and height of the map in terms of the number of elements.
+        *******************************************************************************/
         GetMapAdjacents(int* map = nullptr, int size = 0)
             : GetAdjacents(), map{ map }, size{ size }
         {
         }
 
+        /*!*****************************************************************************
+         * \brief Destroys the `GetMapAdjacents` object.
+        *******************************************************************************/
         virtual ~GetMapAdjacents()
         {
         }
 
-        std::vector<AI::Node*> operator()(Key key)
-        {
-            UNUSED(key)
-
-            std::vector<AI::Node*> list = {};
-
-            // Find and return all empty adjacent cells
-
-            return list;
-        }
+        /*!*****************************************************************************
+         * \brief 
+            Functor operator that returns the adjacent nodes of a given key.
+         *
+         * \param key 
+            The key for which adjacent nodes are to be retrieved.
+         *
+         * \return 
+            A vector of pointers to AI::Node objects representing the adjacent nodes.
+        *******************************************************************************/
+        std::vector<AI::Node*> operator()(Key key);
     };
 
-    // Domain specific functor that returns shuffled adjacent nodes
+    /*!*****************************************************************************
+     * \brief Domain-specific functor that returns shuffled adjacent nodes in a map.
+    *******************************************************************************/
     class GetMapStochasticAdjacents : public GetMapAdjacents
     {
     public:
+        /*!*****************************************************************************
+         * \brief 
+            Constructs a `GetMapStochasticAdjacents` object.
+         *
+         * \param map 
+            A pointer to an array of integers representing the map.
 
+         * \param size 
+            The width and height of the map in terms of the number of elements.
+        *******************************************************************************/
         GetMapStochasticAdjacents(int* map, int size)
             : GetMapAdjacents{ map, size }
         {
         }
 
-        std::vector<AI::Node*> operator()(Key key)
-        {
-            UNUSED(key)
-            
-            std::vector<AI::Node*> list = {};
-            
-            // Find and return all empty adjacent cells
-            // Use the base class operator() and then shuffle the result
-
-            return list;
-        }
+        /*!*****************************************************************************
+         * \brief 
+            Returns a vector of shuffled adjacent nodes in a map.
+         *
+         * \param key 
+            The key of the node whose adjacent nodes are to be retrieved.
+         *
+         * \return 
+            A vector of pointers to shuffled adjacent nodes in the map.
+        *******************************************************************************/
+        std::vector<AI::Node*> operator()(Key key);
     };
 
+    /*!*****************************************************************************
     // Wrappers that provide same interface for queue and stack
-
+    *******************************************************************************/
     struct Interface
     {
         virtual void clear() = 0;
@@ -74,70 +120,78 @@ namespace AI
         virtual Node* pop() = 0;
     };
 
-    struct Queue : Interface //...
+    /*!*****************************************************************************
+    // Declare function for for struct Queue
+    *******************************************************************************/
+    struct Queue : Interface
     {
-        void clear()
-        {
-            //...
-        }
+        std::list<Node*> p_Node;
 
-        void push(Node* pNode)
-        {
-           UNUSED(pNode)
-           //...
-        }
+        void clear();
 
-        Node* pop()
-        {
-            Node* pNode = nullptr;
-            //...
-            return pNode;
-        }
+        void push(Node* pNode);
+
+        Node* pop();
+
+        bool isEmpty();
     };
 
+    /*!*****************************************************************************
+    // Declare function for for struct Stack
+    *******************************************************************************/
     struct Stack : Interface //...
     {
-        void clear()
-        {
-            //...
-        }
 
-        void push(Node* pNode)
-        {
-            UNUSED(pNode)
-            //...
-        }
+        std::list<Node*> p_Node;
 
-        Node* pop()
-        {
-            Node* pNode = nullptr;
-            //...
-            return pNode;
-        }
+        void clear();
+
+        void push(Node* pNode);
+
+        Node* pop();
+
+        bool isEmpty();
     };
 
-    // Recursive Flood Fill
+    /*!*****************************************************************************
+     * \brief Class for performing flood fill using a recursive algorithm.
+    *******************************************************************************/
     class Flood_Fill_Recursive
     {
         GetAdjacents* pGetAdjacents;
 
     public:
+        /*!*****************************************************************************
+         * \brief 
+            Constructs a `Flood_Fill_Recursive` object.
+         *
+         * \param pGetAdjacents 
+            Pointer to a GetAdjacents object used for retrieving adjacent nodes.
+        *******************************************************************************/
         Flood_Fill_Recursive(GetAdjacents* pGetAdjacents)
             : pGetAdjacents{ pGetAdjacents }
         {
         }
+        /*!*****************************************************************************
+         * \brief 
+            Runs the flood fill algorithm recursively.
+         *
+         * \param key 
+            The key of the starting node for flood fill.
 
-        void run(Key key, int color)
-        {
-            UNUSED(key)
-            UNUSED(color)
-
-            // Implement the flood fill
-        }
+         * \param color 
+            The color to fill the connected nodes with.
+        *******************************************************************************/
+        void run(Key key, int color);
     };
 
-    // Iterative Flood Fill
-    // Type T defines is it depth- or breadth-first
+    /*!*****************************************************************************
+     * \brief 
+        Class for performing iterative flood fill.
+     *
+     * \tparam T 
+        Type specifying whether it is depth-first or breadth-first.
+    *******************************************************************************/
     template<typename T>
     class Flood_Fill_Iterative
     {
@@ -145,18 +199,28 @@ namespace AI
         T openlist;
 
     public:
+        /*!*****************************************************************************
+         * \brief 
+            Constructs a `Flood_Fill_Iterative` object.
+         *
+         * \param pGetAdjacents 
+            Pointer to a GetAdjacents object used for retrieving adjacent nodes.
+        *******************************************************************************/
         Flood_Fill_Iterative(GetAdjacents* pGetAdjacents)
             : pGetAdjacents{ pGetAdjacents }, openlist{}
         {
         }
+        /*!*****************************************************************************
+         * \brief 
+            Runs the iterative flood fill algorithm.
+         *
+         * \param key 
+            The key of the starting node for flood fill.
 
-        void run(Key key, int color)
-        {
-            UNUSED(key)
-            UNUSED(color)
-
-            // Implement the flood fill
-        }
+         * \param color 
+            The color to fill the connected nodes with.
+        *******************************************************************************/
+        void run(Key key, int color);
     };
 
 } // end namespace
