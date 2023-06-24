@@ -1,3 +1,21 @@
+/*!*****************************************************************************
+\file functions.h
+\author Chen Yen Hsun
+\par DP email: c.yenhsun\@digipen.edu
+\par Course: CS380
+\par Section: A
+\par Programming Assignment 8
+\date 06-24-2023
+\brief
+
+    The file includes necessary function declaration and definition for Backtracking 
+
+Copyright (C) 2022 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*******************************************************************************/
+
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
@@ -19,11 +37,29 @@ class NextLocation_Sudoku1D
 
 public:
 
+    /*!******************************************************************************/
+    /*
+        @brief
+            Parameter Constructor for class NextLocation_Sudoku1D
+
+        @param map
+            void pointer
+    */
+     /********************************************************************************/
     NextLocation_Sudoku1D(void* map)
         : map{ static_cast<AI::MapInt1D*>(map) }
     {
     }
 
+    /*!******************************************************************************/
+    /*
+        @brief
+            overload operator()
+
+        @return 
+            return AI::Location
+    */
+    /********************************************************************************/
     AI::Location<> operator()() const
     {
         // Your code ...
@@ -45,11 +81,29 @@ class NextLocation_Sudoku2D
 
 public:
 
+    /*!******************************************************************************/
+    /*
+        @brief
+            Parameter Constructor for class NextLocation_Sudoku2D
+
+        @param map
+            void pointer
+    */
+    /********************************************************************************/
     NextLocation_Sudoku2D(void* map)
         : map{ static_cast<AI::MapInt2D*>(map) }
     {
     }
 
+    /*!******************************************************************************/
+    /*
+        @brief
+            overload operator()
+
+        @return
+            return AI::Location
+    */
+    /********************************************************************************/
     AI::Location<> operator()() const
     {
         for (int j = 0; j < map->height; ++j)
@@ -71,11 +125,29 @@ class NextCandidate_Sudoku1D
 
 public:
 
+    /*!******************************************************************************/
+    /*
+        @brief
+            Parameter Constructor for class NextCandidate_Sudoku1D
+
+        @param map
+            void pointer
+    */
+    /********************************************************************************/
     NextCandidate_Sudoku1D(void* map)
         : map{ static_cast<AI::MapInt1D*>(map) }
     {
     }
 
+    /*!******************************************************************************/
+    /*
+        @brief
+            Function that check for index value within the given map location
+
+        @param value
+            int value to check against
+    */
+    /********************************************************************************/
     int indexOf(int value) {
 
         for (int i = 0; i < map->size; ++i) {
@@ -87,6 +159,15 @@ public:
         return -1;
     }
 
+    /*!******************************************************************************/
+    /*
+        @brief
+            overload operator()
+
+        @return
+            return AI::Location
+    */
+    /********************************************************************************/
     int operator()(AI::Location<> location)
     {
         int v = map->base[location.getIndex()];
@@ -111,46 +192,74 @@ class NextCandidate_Sudoku2D
 
 public:
 
+    /*!******************************************************************************/
+    /*
+        @brief
+            Parameter Constructor for class NextCandidate_Sudoku2D
+
+        @param map
+            void pointer
+    */
+    /********************************************************************************/
     NextCandidate_Sudoku2D(void* map)
         : map{ static_cast<AI::MapInt2D*>(map) }
     {
     }
 
+    /*!******************************************************************************/
+    /*
+        @brief
+            Function that check for index value within the given map location
+
+        @param Map[]
+            array of SudoKu map
+
+        @param value
+            int value to check against
+
+        @param index
+            index of the map
+    */
+    /********************************************************************************/
     int indexOf(int Map[], int value, int index) {
 
         int row = index % map->width;
         int col = index / map->height;
         int startrow = row - row % 3;
         int startcol = col - col % 3;
-        int pos = -1;
 
         for (int i = 0; i < map->width; ++i) {
 
-            if (Map[map->width * i + row] == value) {
-                
-                pos = value;
-            }
+            if (Map[map->width * i + row] == value)
+                return value;
         }
 
         for (int i = 0; i < map->height; ++i) {
 
-            if (Map[map->height * i + col] == value) {
-
-                pos = value;
-            }
+            if (Map[map->height * col + i] == value)
+                return value;
         }
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (Map[(i + startcol) * map->width + (j + startrow)] == value) {
-                    pos = value;
-                }
+
+                if (Map[(i + startcol) * map->width + (j + startrow)] == value)
+                    return value;
             }
         }
 
-        return pos;
+        return -1;
     }
 
+    /*!******************************************************************************/
+    /*
+        @brief
+            overload operator()
+
+        @return
+            return v or 0
+    */
+    /********************************************************************************/
     int operator()(AI::Location<> location)
     {
         int v = map->base[location.getIndex()];
@@ -179,18 +288,44 @@ namespace AI
         NC next_candidate;
  
     public:
+
+        /*!******************************************************************************/
+        /*
+            @brief
+                Parameter Constructor for template class Backtracking
+
+            @param map
+                void pointer
+        */
+        /********************************************************************************/
         Backtracking(void* map = nullptr)
             : next_location{ map }, next_candidate{ map }
         {
         }
 
-        // Find solution in a blocking mode
+        /*!******************************************************************************/
+        /*
+            @brief
+                Find solution in a blocking mode
+        */
+        /********************************************************************************/
         void run()
         {
             while (solve() == false) {
             }
         }
 
+
+        /*!******************************************************************************/
+        /*
+            @brief
+                // One iteration of the search. Used by run() in a blocking running mode
+                // or can be called by timer in an non-blocking run
+
+            @return
+                bool
+        */
+        /********************************************************************************/
         // One iteration of the search. Used by run() in a blocking running mode
         // or can be called by timer in an non-blocking run
         bool solve()
