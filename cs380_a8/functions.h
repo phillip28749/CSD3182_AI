@@ -27,7 +27,10 @@ public:
     AI::Location<> operator()() const
     {
         // Your code ...
-        
+        for (int i = 0; i < map->size; ++i)
+            if (map->base[i] == 0)
+                return AI::Location<int>(map->base, i);
+
         return AI::Location<int>{ nullptr, 0 };
     }
 };
@@ -49,7 +52,10 @@ public:
 
     AI::Location<> operator()() const
     {
-        // Your code ...
+        for (int j = 0; j < map->height; ++j)
+            for (int i = 0; i < map->width; ++i)
+                if (map->base[j * map->width + i] == 0)
+                    return AI::Location<>{map->base, j* map->width + i};
 
         return AI::Location<>{ nullptr, 0 };
     }
@@ -70,11 +76,26 @@ public:
     {
     }
 
+    int indexOf(int value) {
+
+        for (int i = 0; i < map->size; ++i) {
+            if (map->base[i] == value) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     int operator()(AI::Location<> location)
     {
-        UNUSED(location)
-
-        // Your code ...
+        int v = map->base[location.getIndex()];
+        while (v < map->size)
+        {
+            v++;
+            if (indexOf(v) == -1)
+                return v;
+        }
 
         return 0;
     }
@@ -95,11 +116,50 @@ public:
     {
     }
 
+    int indexOf(int Map[], int value, int index) {
+
+        int row = index % map->width;
+        int col = index / map->height;
+        int startrow = row - row % 3;
+        int startcol = col - col % 3;
+        int pos = -1;
+
+        for (int i = 0; i < map->width; ++i) {
+
+            if (Map[map->width * i + row] == value) {
+                
+                pos = value;
+            }
+        }
+
+        for (int i = 0; i < map->height; ++i) {
+
+            if (Map[map->height * i + col] == value) {
+
+                pos = value;
+            }
+        }
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (Map[(i + startcol) * map->width + (j + startrow)] == value) {
+                    pos = value;
+                }
+            }
+        }
+
+        return pos;
+    }
+
     int operator()(AI::Location<> location)
     {
-        UNUSED(location)
-
-        // Your code ...
+        int v = map->base[location.getIndex()];
+        while (v < map->height)
+        {
+            v++;
+            if (indexOf(map->base, v, location.getIndex()) == -1)
+                return v;
+        }
 
         return 0;
     }
@@ -127,15 +187,44 @@ namespace AI
         // Find solution in a blocking mode
         void run()
         {
-            // Your code ...
+            while (solve() == false) {
+            }
         }
 
         // One iteration of the search. Used by run() in a blocking running mode
         // or can be called by timer in an non-blocking run
         bool solve()
         {
-            // Your code ...
+            if (this->stack.empty())
+            {
+                // Set the stack to start the search
+                auto location = this->next_location.operator()();
+                if (location.notFound())
+                    return true;
+                stack.push(location);
+            }
 
+            auto location = this->stack.top();
+            auto candidate = this->next_candidate.operator()(location);
+            if (candidate)
+            {
+                // If there is a new candidate for the current location, 
+                // set it and find next location to check in the next call 
+                // of this function      
+                location.setValue(candidate);
+                auto next = this->next_location.operator()();
+                if (next.notFound()) // No more locations, a solution is found
+                    return true;
+                this->stack.push(next);
+            }
+            else
+            {
+                // If a new candidate not found, backtrack by cleaning 
+                // location and popping it from the stack    
+                location.clearValue();
+                this->stack.pop();
+            }
+            // Solution not found yet, so return false to repeat the process
             return false;
         }
     };
