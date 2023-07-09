@@ -1,3 +1,21 @@
+/*!*****************************************************************************
+\file functions.h
+\author Chen Yen Hsun
+\par DP email: c.yenhsun\@digipen.edu
+\par Course: CS380
+\par Section: A
+\par Programming Assignment 10
+\date 07-09-2023
+\brief
+
+	The file includes necessary function declaration and definition for Behavior Trees
+
+
+Copyright (C) 2022 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*******************************************************************************/
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
@@ -19,21 +37,40 @@ namespace AI
 		State checkstate;
 
 	public:
+
+		/*!******************************************************************************/
+		/*
+			@brief
+				CheckState Constructor
+
+			@param checktask
+				Create action task
+
+			@param checkstate
+				Status of BT node
+		*/
+		/********************************************************************************/
 		CheckState(Task checktask = {}, State checkstate = State::Success)
 			: Task{ "CheckState" }, checktask{ checktask }, checkstate{ checkstate }
 		{
 		}
 
-		Task& operator()(Log* log = nullptr, std::string level = "") {
+		/*!******************************************************************************/
+		/*
+			@brief
+				override operator() for CheckState
 
-			if (log) *log << level << "CheckState" << '(' << checktask.getId() << ',' << STATES[checkstate] << ')' << std::endl;
+			@param log
+				log osstream
 
-			state = checktask.getState() == checkstate ? State::Success : State::Failure;
+			@param level
+				string level
 
-			if (log) *log << level << "L " << STATES[state] << std::endl;
-
-			return *this;
-		}
+			@return
+				action task
+		*/
+		/********************************************************************************/
+		Task& operator()(Log* log = nullptr, std::string level = "");
 
 	};
 
@@ -45,28 +82,37 @@ namespace AI
 		std::list<SMART> tasks;
 
 	public:
+
+		/*!******************************************************************************/
+		/*
+			@brief
+				Selector Constructor
+
+			@param tasks
+				BT nodes
+		*/
+		/********************************************************************************/
 		Selector(std::initializer_list<SMART> tasks = {})
 			: Task{ "Selector" }, tasks{ tasks }
 		{
 		}
 
-		Task& operator()(Log* log = nullptr, std::string level = "") {
+		/*!******************************************************************************/
+		/*
+			@brief
+				override operator() for Selector
 
-			if (log) *log << level << "Selector()" << std::endl;
+			@param log
+				log osstream
 
-			state = State::Failure;
+			@param level
+				string level
 
-			for (auto task : tasks) {
-
-				state = task->operator()(log, level + "| ").getState();
-				if (state != State::Failure)
-					break;
-			}
-
-			if (log) *log << level << "L " << STATES[state] << std::endl;
-
-			return *this;
-		}
+			@return
+				action task
+		*/
+		/********************************************************************************/
+		Task& operator()(Log* log = nullptr, std::string level = "");
 		
 	};
 
@@ -78,29 +124,38 @@ namespace AI
 		std::list<SMART> tasks;
 
 	public:
+
+		/*!******************************************************************************/
+		/*
+			@brief
+				Sequencer Constructor
+
+			@param tasks
+				BT nodes
+		*/
+		/********************************************************************************/
 		Sequence(std::initializer_list<SMART> tasks = {})
 			: Task{ "Sequence" }, tasks{ tasks }
 		{
 		}
 
-		Task& operator()(Log* log = nullptr, std::string level = "") {
+		/*!******************************************************************************/
+		/*
+			@brief
+				override operator() for sequencer
 
-			if (log) *log << level << "Sequence()" << std::endl;
+			@param log
+				log osstream
 
-			state = State::Success;
+			@param level
+				string level
 
-			for (auto task : tasks) {
+			@return
+				action task
+		*/
+		/********************************************************************************/
+		Task& operator()(Log* log = nullptr, std::string level = "");	
 
-				state = task->operator()(log, level + "| ").getState();
-				if (state != State::Success)
-					break;
-			}
-
-			if (log) *log << level << "L " << STATES[state] << std::endl;
-
-			return *this;
-		}
-		
 	};
 
 	// Random selector composite
@@ -110,31 +165,37 @@ namespace AI
 		std::list<SMART> tasks;
 
 	public:
+
+		/*!******************************************************************************/
+		/*
+			@brief
+				RandomSelector Constructor
+
+			@param tasks
+				BT nodes
+		*/
+		/********************************************************************************/
 		RandomSelector(std::initializer_list<SMART> tasks = {})
 			: Task{ "RandomSelector" }, tasks{ tasks }
 		{
 		}
 
-		Task& operator()(Log* log = nullptr, std::string level = "") {
+		/*!******************************************************************************/
+		/*
+			@brief
+				override operator() for RandomSelector
 
-			if (log) *log << level << "RandomSelector()" << std::endl;
+			@param log
+				log osstream
 
-			state = State::Failure;
+			@param level
+				string level
 
-			if (!tasks.empty()) {
-
-				size_t i = std::rand() % tasks.size();
-
-				auto it = tasks.begin();
-				std::advance(it, i);
-
-				state = (*it)->operator()(log, level + "| ").getState();
-			}
-
-			if (log) *log << level << "L " << STATES[state] << std::endl;
-
-			return *this;
-		}
+			@return
+				action task
+		*/
+		/********************************************************************************/
+		Task& operator()(Log* log = nullptr, std::string level = "");
 		
 	};
 
@@ -149,24 +210,37 @@ namespace AI
 		SMART task;
 
 	public:
+
+		/*!******************************************************************************/
+		/*
+			@brief
+				Inverter Constructor
+
+			@param tasks
+				BT nodes
+		*/
+		/********************************************************************************/
 		Inverter(SMART task = {})
 			: Task{ "Inverter" }, task{ task }
 		{
 		}
 
-		Task& operator()(Log* log = nullptr, std::string level = "") {
+		/*!******************************************************************************/
+		/*
+			@brief
+				override operator() for Inverter
 
-			if (log) *log << level << "Inverter()" << std::endl;
+			@param log
+				log osstream
 
-			task->operator()(log, level + "| ");
+			@param level
+				string level
 
-			state = (task->getState() == State::Success) ? State::Failure : State::Success;
-
-			if (log) *log << level << "L " << STATES[state] << std::endl;
-
-			return *this;
-		}
-		
+			@return
+				action task
+		*/
+		/********************************************************************************/
+		Task& operator()(Log* log = nullptr, std::string level = "");
 		
 	};
 
@@ -180,23 +254,37 @@ namespace AI
 		SMART task;
 
 	public:
+
+		/*!******************************************************************************/
+		/*
+			@brief
+				Succeeder Constructor
+
+			@param tasks
+				BT nodes
+		*/
+		/********************************************************************************/
 		Succeeder(SMART task = {})
 			: Task{ "Succeeder" }, task{ task }
 		{
 		}
 
-		Task& operator()(Log* log = nullptr, std::string level = "") {
+		/*!******************************************************************************/
+		/*
+			@brief
+				override operator() for Succeeder
 
-			if (log) *log << level << "Succeeder()" << std::endl;
+			@param log
+				log osstream
 
-			state = State::Success;
+			@param level
+				string level
 
-			task->operator()(log, level + "| ");
-
-			if (log) *log << level << "L " << STATES[state] << std::endl;
-
-			return *this;
-		}
+			@return
+				action task
+		*/
+		/********************************************************************************/
+		Task& operator()(Log* log = nullptr, std::string level = "");
 
 	};
 
@@ -212,25 +300,38 @@ namespace AI
 		int counter;
 
 	public:
+
+		/*!******************************************************************************/
+		/*
+			@brief
+				Repeater Constructor
+
+			@param tasks
+				BT nodes
+		*/
+		/********************************************************************************/
 		Repeater(SMART task = {}, int counter = 0)
 			: Task{ "Repeater" }, task{ task }, counter{ counter }
 		{
 		}
 
-		Task& operator()(Log* log = nullptr, std::string level = "") {
+		/*!******************************************************************************/
+		/*
+			@brief
+				override operator() for Repeater
 
-			if (log) *log << level << "Repeater" << '(' << counter << ')' << std::endl;
+			@param log
+				log osstream
 
-			state = State::Success;
+			@param level
+				string level
 
-			while(task && (counter--) > 0)
-				task->operator()(log, level + "| ");
+			@return
+				action task
+		*/
+		/********************************************************************************/
+		Task& operator()(Log* log = nullptr, std::string level = "");
 
-			if (log) *log << level << "L " << STATES[state] << std::endl;
-
-			return *this;
-		}
-		
 	};
 
 	// Repeat_until_fail
@@ -243,22 +344,37 @@ namespace AI
 		SMART task;
 
 	public:
+
+		/*!******************************************************************************/
+		/*
+			@brief
+				Repeat_until_fail Constructor
+
+			@param tasks
+				BT nodes
+		*/
+		/********************************************************************************/
 		Repeat_until_fail(SMART task = {})
 			: Task{ "Repeat_until_fail" }, task{ task }
 		{
 		}
 
-		Task& operator()(Log* log = nullptr, std::string level = "") {
+		/*!******************************************************************************/
+		/*
+			@brief
+				override operator() for Repeat_until_fail
 
-			if (log) *log << level << "Repeat_until_fail()" << std::endl;
-			state = State::Success;
+			@param log
+				log osstream
 
-			while (task && task->operator()(log, level + "| ").getState() == State::Success);
+			@param level
+				string level
 
-			if (log) *log << level << "L " << STATES[state] << std::endl;
-
-			return *this;
-		}
+			@return
+				action task
+		*/
+		/********************************************************************************/
+		Task& operator()(Log* log = nullptr, std::string level = "");
 
 	};
 
