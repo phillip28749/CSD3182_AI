@@ -24,8 +24,17 @@ namespace AI
 		{
 		}
 
-		// Your code ...
-		
+		Task& operator()(Log* log = nullptr, std::string level = "") {
+
+			if (log) *log << level << "CheckState" << '(' << checktask.getId() << ',' << STATES[checkstate] << ')' << std::endl;
+
+			state = checktask.getState() == checkstate ? State::Success : State::Failure;
+
+			if (log) *log << level << "L " << STATES[state] << std::endl;
+
+			return *this;
+		}
+
 	};
 
 	// Selector composite
@@ -41,7 +50,23 @@ namespace AI
 		{
 		}
 
-		// Your code ...
+		Task& operator()(Log* log = nullptr, std::string level = "") {
+
+			if (log) *log << level << "Selector()" << std::endl;
+
+			state = State::Failure;
+
+			for (auto task : tasks) {
+
+				state = task->operator()(log, level + "| ").getState();
+				if (state != State::Failure)
+					break;
+			}
+
+			if (log) *log << level << "L " << STATES[state] << std::endl;
+
+			return *this;
+		}
 		
 	};
 
@@ -58,7 +83,23 @@ namespace AI
 		{
 		}
 
-		// Your code ...
+		Task& operator()(Log* log = nullptr, std::string level = "") {
+
+			if (log) *log << level << "Sequence()" << std::endl;
+
+			state = State::Success;
+
+			for (auto task : tasks) {
+
+				state = task->operator()(log, level + "| ").getState();
+				if (state != State::Success)
+					break;
+			}
+
+			if (log) *log << level << "L " << STATES[state] << std::endl;
+
+			return *this;
+		}
 		
 	};
 
@@ -74,7 +115,26 @@ namespace AI
 		{
 		}
 
-		// Your code ...
+		Task& operator()(Log* log = nullptr, std::string level = "") {
+
+			if (log) *log << level << "RandomSelector()" << std::endl;
+
+			state = State::Failure;
+
+			if (!tasks.empty()) {
+
+				size_t i = std::rand() % tasks.size();
+
+				auto it = tasks.begin();
+				std::advance(it, i);
+
+				state = (*it)->operator()(log, level + "| ").getState();
+			}
+
+			if (log) *log << level << "L " << STATES[state] << std::endl;
+
+			return *this;
+		}
 		
 	};
 
@@ -94,7 +154,19 @@ namespace AI
 		{
 		}
 
-		// Your code ...
+		Task& operator()(Log* log = nullptr, std::string level = "") {
+
+			if (log) *log << level << "Inverter()" << std::endl;
+
+			task->operator()(log, level + "| ");
+
+			state = (task->getState() == State::Success) ? State::Failure : State::Success;
+
+			if (log) *log << level << "L " << STATES[state] << std::endl;
+
+			return *this;
+		}
+		
 		
 	};
 
@@ -113,7 +185,18 @@ namespace AI
 		{
 		}
 
-		// Your code ...
+		Task& operator()(Log* log = nullptr, std::string level = "") {
+
+			if (log) *log << level << "Succeeder()" << std::endl;
+
+			state = State::Success;
+
+			task->operator()(log, level + "| ");
+
+			if (log) *log << level << "L " << STATES[state] << std::endl;
+
+			return *this;
+		}
 
 	};
 
@@ -134,7 +217,19 @@ namespace AI
 		{
 		}
 
-		// Your code ...
+		Task& operator()(Log* log = nullptr, std::string level = "") {
+
+			if (log) *log << level << "Repeater" << '(' << counter << ')' << std::endl;
+
+			state = State::Success;
+
+			while(task && (counter--) > 0)
+				task->operator()(log, level + "| ");
+
+			if (log) *log << level << "L " << STATES[state] << std::endl;
+
+			return *this;
+		}
 		
 	};
 
@@ -153,7 +248,17 @@ namespace AI
 		{
 		}
 
-		// Your code ...
+		Task& operator()(Log* log = nullptr, std::string level = "") {
+
+			if (log) *log << level << "Repeat_until_fail()" << std::endl;
+			state = State::Success;
+
+			while (task && task->operator()(log, level + "| ").getState() == State::Success);
+
+			if (log) *log << level << "L " << STATES[state] << std::endl;
+
+			return *this;
+		}
 
 	};
 
