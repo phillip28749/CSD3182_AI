@@ -1,3 +1,20 @@
+/*!*****************************************************************************
+\file functions.h
+\author Chen Yen Hsun
+\par DP email: c.yenhsun\@digipen.edu
+\par Course: CS380
+\par Section: A
+\par Programming Assignment 11
+\date 07-12-2023
+\brief
+
+	The file includes necessary function declaration for Fuzzy Logic
+
+Copyright (C) 2022 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*******************************************************************************/
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
@@ -118,6 +135,18 @@ namespace AI
 		{
 		}
 
+		/*!******************************************************************************/
+		/*
+			@brief
+				overrided calculateDOM function
+
+			@param val
+				value
+
+			@return
+				degree of membership for a particular value
+		*/
+		/********************************************************************************/
 		float calculateDOM(float val) const override;
 	};
 
@@ -130,6 +159,18 @@ namespace AI
 		{
 		}
 
+		/*!******************************************************************************/
+		/*
+			@brief
+				overrided calculateDOM function
+
+			@param val
+				value
+
+			@return
+				degree of membership for a particular value
+		*/
+		/********************************************************************************/
 		float calculateDOM(float val) const override;
 
 	};
@@ -144,6 +185,18 @@ namespace AI
 		{
 		}
 
+		/*!******************************************************************************/
+		/*
+			@brief
+				overrided calculateDOM function
+
+			@param val
+				value
+
+			@return
+				degree of membership for a particular value
+		*/
+		/********************************************************************************/
 		float calculateDOM(float val) const override;
 	};
 
@@ -158,6 +211,18 @@ namespace AI
 		{
 		}
 
+		/*!******************************************************************************/
+		/*
+			@brief
+				overrided calculateDOM function
+
+			@param val
+				value
+
+			@return
+				degree of membership for a particular value
+		*/
+		/********************************************************************************/
 		float calculateDOM(float val) const override;
 	};
 
@@ -209,6 +274,15 @@ namespace AI
 		{
 		}
 
+		/*!******************************************************************************/
+		/*
+			@brief
+				overrided getDOM() function
+
+			@return
+				Returns the minimum DOM of the sets it is operating on
+		*/
+		/********************************************************************************/
 		float getDOM() override;
 	};
 
@@ -221,6 +295,15 @@ namespace AI
 		{
 		}
 
+		/*!******************************************************************************/
+		/*
+			@brief
+				overrided getDOM() function
+
+			@return
+				Returns the minimum DOM of the sets it is operating on
+		*/
+		/********************************************************************************/
 		float getDOM() override;
 	};
 
@@ -318,11 +401,29 @@ namespace AI
 				set.second->ORwithDOM(val);
 		}
 
-		// Defuzzifies the value by averaging the maxima of the sets that have fired.
-		// Returns sum (maxima * degree of membership) / sum (degree of memberships) 
+		/*!******************************************************************************/
+		/*
+			@brief
+				Defuzzifies the value by averaging the maxima of the sets that have fired.
+
+			@return
+				Returns sum (maxima * degree of membership) / sum (degree of memberships)
+		*/
+		/********************************************************************************/
 		float deFuzzifyMaxAv();
 
-		// Defuzzify the variable using the centroid method
+		/*!******************************************************************************/
+		/*
+			@brief
+				Defuzzify the variable using the centroid method
+
+			@param numSamples
+				number of sameple
+
+			@return
+				Dividing the total area by the sum of the moments gives the centroid
+		*/
+		/********************************************************************************/
 		float deFuzzifyCentroid(int numSamples);
 	};
 
@@ -414,8 +515,21 @@ namespace AI
 			variables[varName].fuzzify(val);
 		}
 
-		// Given a fuzzy variable and a deffuzification method 
-		// this returns a crisp value
+		/*!******************************************************************************/
+		/*
+			@brief
+				Given a fuzzy variable and a deffuzification method
+
+			@param varName
+				variable name
+
+			@param method
+				method type
+
+			@return
+				crisp value
+		*/
+		/********************************************************************************/
 		float deFuzzify(const std::string& varName, DefuzzifyMethod method);
 	};
 

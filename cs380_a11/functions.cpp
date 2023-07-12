@@ -1,7 +1,36 @@
+/*!*****************************************************************************
+\file functions.cpp
+\author Chen Yen Hsun
+\par DP email: c.yenhsun\@digipen.edu
+\par Course: CS380
+\par Section: A
+\par Programming Assignment 11
+\date 07-12-2023
+\brief
+
+	The file includes necessary function definition for Fuzzy Logic
+
+Copyright (C) 2022 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*******************************************************************************/
 #include "functions.h"
 
 namespace AI
 {
+	/*!******************************************************************************/
+	/*
+		@brief
+			overrided calculateDOM function 
+
+		@param val
+			value
+
+		@return
+			degree of membership for a particular value
+	*/
+	/********************************************************************************/
 	float FuzzySet_LeftShoulder::calculateDOM(float val) const {
 		
 		// Test for the case where the left or right offsets are zero
@@ -23,6 +52,18 @@ namespace AI
 		return 0.0;
 	}
 
+	/*!******************************************************************************/
+	/*
+		@brief
+			overrided calculateDOM function
+
+		@param val
+			value
+
+		@return
+			degree of membership for a particular value
+	*/
+	/********************************************************************************/
 	float FuzzySet_RightShoulder::calculateDOM(float val) const
 	{
 		// Test for the case where the left or right offsets are zero
@@ -43,6 +84,18 @@ namespace AI
 		return 0.0;
 	}
 
+	/*!******************************************************************************/
+	/*
+		@brief
+			overrided calculateDOM function
+
+		@param val
+			value
+
+		@return
+			degree of membership for a particular value
+	*/
+	/********************************************************************************/
 	float FuzzySet_Singleton::calculateDOM(float val) const
 	{
 		if ((val >= peakPoint - leftOffset)
@@ -53,6 +106,18 @@ namespace AI
 		return 0.0;
 	}
 
+	/*!******************************************************************************/
+	/*
+		@brief
+			overrided calculateDOM function
+
+		@param val
+			value
+
+		@return
+			degree of membership for a particular value
+	*/
+	/********************************************************************************/
 	float FuzzySet_Triangle::calculateDOM(float val) const
 	{
 		// Test for the case where the left or right offsets are zero
@@ -73,6 +138,15 @@ namespace AI
 		return 0.0;
 	}
 
+	/*!******************************************************************************/
+	/*
+		@brief
+			overrided getDOM() function
+
+		@return
+			Returns the minimum DOM of the sets it is operating on
+	*/
+	/********************************************************************************/
 	float FuzzyAND::getDOM()
 	{
 		float smallest = std::numeric_limits<float>::max();
@@ -85,6 +159,15 @@ namespace AI
 		return smallest == std::numeric_limits<float>::max() ? 0.0f : smallest;
 	}
 
+	/*!******************************************************************************/
+	/*
+		@brief
+			overrided getDOM() function
+
+		@return
+			Returns the minimum DOM of the sets it is operating on
+	*/
+	/********************************************************************************/
 	float FuzzyOR::getDOM()
 	{
 		float largest = std::numeric_limits<float>::min();
@@ -97,6 +180,15 @@ namespace AI
 		return largest == std::numeric_limits<float>::min() ? 0.0f : largest;
 	}
 
+	/*!******************************************************************************/
+	/*
+		@brief
+			Defuzzifies the value by averaging the maxima of the sets that have fired.
+			
+		@return
+			Returns sum (maxima * degree of membership) / sum (degree of memberships)
+	*/
+	/********************************************************************************/
 	float FuzzyVariable::deFuzzifyMaxAv()
 	{
 		float bottom = 0.0;
@@ -115,6 +207,18 @@ namespace AI
 		return top / bottom;
 	}
 
+	/*!******************************************************************************/
+	/*
+		@brief
+			Defuzzify the variable using the centroid method
+
+		@param numSamples
+			number of sameple
+
+		@return
+			Dividing the total area by the sum of the moments gives the centroid
+	*/
+	/********************************************************************************/
 	float FuzzyVariable::deFuzzifyCentroid(int numSamples)
 	{
 		// Calculate the step size
@@ -157,6 +261,21 @@ namespace AI
 		return sumOfMoments / totalArea;
 	}
 
+	/*!******************************************************************************/
+	/*
+		@brief
+			Given a fuzzy variable and a deffuzification method 
+
+		@param varName
+			variable name
+
+		@param method
+			method type
+
+		@return
+			crisp value
+	*/
+	/********************************************************************************/
 	float FuzzyModule::deFuzzify(const std::string& varName, DefuzzifyMethod method)
 	{
 		// Clear the DOMs of all the consequents of all the rules
