@@ -118,8 +118,7 @@ namespace AI
 		{
 		}
 
-		// Your code ...
-
+		float calculateDOM(float val) const override;
 	};
 
 	// Definition of a fuzzy set that has a right shoulder shape.
@@ -131,7 +130,7 @@ namespace AI
 		{
 		}
 
-		// Your code ...
+		float calculateDOM(float val) const override;
 
 	};
 
@@ -145,8 +144,7 @@ namespace AI
 		{
 		}
 
-		// Your code ...
-
+		float calculateDOM(float val) const override;
 	};
 
 	// This is a simple class to define fuzzy sets that have a triangular 
@@ -160,8 +158,7 @@ namespace AI
 		{
 		}
 
-		// Your code ...
-
+		float calculateDOM(float val) const override;
 	};
 
 
@@ -212,8 +209,7 @@ namespace AI
 		{
 		}
 
-		// Your code ...
-
+		float getDOM() override;
 	};
 
 	// Definition of the OR operator class
@@ -225,8 +221,7 @@ namespace AI
 		{
 		}
 
-		// Your code ...
-
+		float getDOM() override;
 	};
 
 	// Definition of the fuzzy variable class
@@ -325,23 +320,10 @@ namespace AI
 
 		// Defuzzifies the value by averaging the maxima of the sets that have fired.
 		// Returns sum (maxima * degree of membership) / sum (degree of memberships) 
-		float deFuzzifyMaxAv()
-		{
-
-			// Your code ...
-
-			return 0.0f;
-		}
+		float deFuzzifyMaxAv();
 
 		// Defuzzify the variable using the centroid method
-		float deFuzzifyCentroid(int numSamples)
-		{
-			UNUSED(numSamples);
-
-			// Your code ...
-
-			return 0.0f;
-		}
+		float deFuzzifyCentroid(int numSamples);
 	};
 
 
@@ -434,15 +416,7 @@ namespace AI
 
 		// Given a fuzzy variable and a deffuzification method 
 		// this returns a crisp value
-		float deFuzzify(const std::string& varName, DefuzzifyMethod method)
-		{
-			UNUSED(varName);
-			UNUSED(method);
-
-			// Your code ...
-
-			return 0.0f;
-		}
+		float deFuzzify(const std::string& varName, DefuzzifyMethod method);
 	};
 
 
