@@ -447,7 +447,8 @@ namespace AI
 
             // Select fittest parents to mate and produce a new generation
             auto newGeneration = selection(population->getSize());
-
+            delete population;
+            
             // Recombination: creates new individuals by taking the
             // chromosomes from the fittest members of the
             // population and modifing these chromosomes using
