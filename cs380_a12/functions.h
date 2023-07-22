@@ -15,11 +15,13 @@ struct Fitness_Accumulate
 {
     int operator()(const std::vector<Gene>& genes) const
     {
-        UNUSED(genes);
+        int sum = 0; 
 
-        // Your code ...
+        for (auto gene : genes) {
+            sum += gene.getValue();
+        }
 
-        return 0;
+        return sum;
     }
 };
 
@@ -31,11 +33,15 @@ struct Fitness_Nbits
 {
     int operator()(const std::vector<Gene>& genes) const
     {
-        UNUSED(genes);
+        float percent = 0.0f;
 
-        // Your code ...
+        for (auto gene : genes) {
+            if (gene.getValue()) {
+                percent += gene.getValue();
+            }
+        }
 
-        return 0;
+        return static_cast<int>(percent/genes.size()*100);
     }
 };
 
@@ -47,11 +53,11 @@ struct Fitness_8queens
 {
     int operator()(const std::vector<Gene>& genes) const
     {
-        UNUSED(genes);
+        for (auto gene : genes) {
+            if (gene.getValue() == 8) return 0;
+        }
 
-        // Your code ...
-
-        return 0;
+        return 100;
     }
 };
 
@@ -86,8 +92,7 @@ namespace AI
     {
         int operator()(int /* p */ = 0) const
         {
-            // Your code ...
-            return 0;
+            return std::rand() % Max;
         }
     };
 
@@ -283,7 +288,18 @@ namespace AI
 
         void updateFittest()
         {
-            // Your code ...
+            if (getSize())
+            {
+                fittest = &getIndividual(0);
+
+                for (int i = 1; i < static_cast<int>(getSize()); ++i)
+                {
+                    if (individuals[i].getFitness() > fittest->getFitness())
+                        fittest = &getIndividual(i);
+                }
+            }
+            else
+                fittest = nullptr;
         }
 
         friend std::ostream& operator<<(std::ostream& os, Population& rhs)
@@ -310,54 +326,91 @@ namespace AI
 
         ~GeneticAlgorithm()
         {
-            // Your code ...
+            delete population;
         }
 
         Individual* getFittest() const
         {
-
-            // Your code ...
-            
-            return nullptr;
+            return population->getFittest();
         }
 
         // Implementation of the Roulette Wheel Selection. The probability of an 
         // individual to be selected is directly proportional to its fitness.
         Population<Individual>* selection(size_t sizeOfPopulation)
         {
-            UNUSED(sizeOfPopulation);
+            if (!this->population)
+                this->setPopulation(new Population<Individual>(sizeOfPopulation));
 
-            // Your code ...
+            auto newGeneration = new Population<Individual>(sizeOfPopulation);
 
-            return nullptr;
+            // Play roulette
+            int sum_fitness = 0;
+            for (unsigned int i = 0; i < sizeOfPopulation; ++i)
+                sum_fitness += this->population->getIndividual(i).getFitness();
+
+            for (unsigned int i = 0; i < sizeOfPopulation; ++i)
+            {
+                int rnd = std::rand() % sum_fitness;
+                unsigned int I = 0;
+                for (; I < sizeOfPopulation; ++I)
+                {
+                    rnd -= this->population->getIndividual(I).getFitness();
+                    if (rnd <= 0)
+                        break;
+                }
+                // Copy genes
+                newGeneration->getIndividual(i).copyGenesFrom(
+                    this->population->getIndividual(I));
+            }
+            return newGeneration;
         }
 
         // Crossover parents genes
         void crossover(Population<Individual>* newGeneration, 
             CrossoverMethod crossoverMethod)
         {
-            UNUSED(newGeneration);
-            UNUSED(crossoverMethod);
+            int sizeOfChromosome = (int)newGeneration->getIndividual(0).getGenes().size();
 
-            // Your code ...
+            int crossOverPoint = 0;
+            if (crossoverMethod == CrossoverMethod::Middle)
+                crossOverPoint = sizeOfChromosome / 2;
+            else if (crossoverMethod == CrossoverMethod::Random)
+                crossOverPoint = (int)(std::rand() % sizeOfChromosome / 2);
+
+            for (unsigned int j = 0; j < newGeneration->getSize() - 1; j += 2)
+            {
+                // Swap values among pairs
+                for (int i = 0; i < crossOverPoint; ++i)
+                {
+                    // Swap genes
+                    auto t = newGeneration->getIndividual(j + 1).getGene(i);
+                    newGeneration->getIndividual(j + 1).setGene(i,
+                        newGeneration->getIndividual(j).getGene(i));
+                    newGeneration->getIndividual(j).setGene(i, t);
+                }
+            }
         }
 
         // Do mutation of genes under a random probability
         void mutation(Population<Individual>* newGeneration, 
             int mutationProbability)
         {
-            UNUSED(newGeneration);
-            UNUSED(mutationProbability);
+            int sizeOfPopulation = newGeneration ?
+                static_cast<int>(newGeneration->getSize()) : 0;
 
-            // Your code ...
+            for (int j = 0; j < sizeOfPopulation; ++j)
+                // Select a random mutation point and flip 
+                // genes at the mutation point
+                if (std::rand() % 100 < mutationProbability)
+                    newGeneration->getIndividual(j)
+                    .getChromosome().randomMutation();
         }
 
         // Replace existing population if any with a new generation
         void setPopulation(Population<Individual>* newGeneration)
         {
-            UNUSED(newGeneration);
-
-            // Your code ...
+            this->population = newGeneration;
+            this->population->updateFittest();
         }
 
         // Start the search
@@ -365,23 +418,47 @@ namespace AI
                     CrossoverMethod crossoverMethod = CrossoverMethod::Middle, 
                     std::ostringstream* os = nullptr)
         {
-            UNUSED(sizeOfPopulation);
-            UNUSED(mutationProbability);
-            UNUSED(crossoverMethod);
-            UNUSED(os);
+            this->generation = 0;
 
-            // Your code ...
+            this->setPopulation(new Population<Individual>(sizeOfPopulation));
+
+            // While loop until the solution is found
+            while (this->next(mutationProbability, crossoverMethod, os))
+            {
+            }
         }
 
         // Continue the search
         bool next(int mutationProbability, CrossoverMethod crossoverMethod, 
                     std::ostringstream* os)
         {
-            UNUSED(mutationProbability);
-            UNUSED(crossoverMethod);
-            UNUSED(os);
+            if (!population)
+                this->setPopulation(new Population<Individual>(population->getSize()));
 
-            // Your code ...
+            if (os)
+                *os << "\nGeneration: " + this->generation +
+                os->str() + '\n';
+
+            // Stop the search when either max fitness of solution or 
+            // max limit for generations achived
+            if (population->getFittest()->getFitness() == 100
+                || generation > 10000)
+                return false;
+
+            // Select fittest parents to mate and produce a new generation
+            auto newGeneration = selection(population->getSize());
+
+            // Recombination: creates new individuals by taking the
+            // chromosomes from the fittest members of the
+            // population and modifing these chromosomes using
+            // crossover and/or mutation.
+            this->crossover(newGeneration, crossoverMethod);
+            this->mutation(newGeneration, mutationProbability);
+
+            // Set population with new generation
+            this->setPopulation(newGeneration);
+
+            this->generation++;
 
             return true;
         }
